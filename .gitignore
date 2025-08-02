@@ -3,3 +3,5 @@ Build/tools/gcc/
 Build/tools/
 Build/VS/.vs/
 Build/VS/STM32F446RE_RTOS.vcxproj.user
+Build/Bin/
+Build/Tmp/
