@@ -1,0 +1,194 @@
+#------------------------------------------------------------------------------
+#  Copyright Iliass Mahjoub 2023.
+#  Copyright Christopher Kormanyos 1995 - 2023.
+#  Distributed under the Boost Software License,
+#  Version 1.0. (See accompanying file LICENSE_1_0.txt
+#  or copy at http://www.boost.org/LICENSE_1_0.txt)
+#------------------------------------------------------------------------------
+
+
+#------------------------------------------------------------------------------
+# Paths and tools
+#------------------------------------------------------------------------------
+
+PATH_MAKE       = $(CURDIR)/../Make
+PATH_SRC        = $(CURDIR)/../../Src
+PATH_TMP        = $(CURDIR)/../Tmp/STM32F446RE_x64
+PATH_BIN        = $(CURDIR)/../Bin/STM32F446RE_x64
+PATH_OBJ        = $(PATH_TMP)/Obj
+
+ifeq ($(TYP_OS),win)
+
+PATH_TOOLS = $(CURDIR)/../tools
+PATH_TOOLS_UTIL = $(PATH_TOOLS)/util
+PATH_TOOLS_GCC  = $(PATH_TOOLS)/gcc/gcc-13.2.1-arm-none-eabi/bin
+
+CC              = $(PATH_TOOLS_GCC)/arm-none-eabi-g++.exe
+OBJCOPY         = $(PATH_TOOLS_GCC)/arm-none-eabi-objcopy.exe
+OBJDUMP         = $(PATH_TOOLS_GCC)/arm-none-eabi-objdump.exe
+READELF         = $(PATH_TOOLS_GCC)/arm-none-eabi-readelf.exe
+
+ECHO            = $(PATH_TOOLS_UTIL)/bin/echo.exe
+MAKE            = $(PATH_TOOLS_UTIL)/bin/make.exe
+MKDIR           = $(PATH_TOOLS_UTIL)/bin/mkdir.exe
+RM              = $(PATH_TOOLS_UTIL)/bin/rm.exe
+SED             = $(PATH_TOOLS_UTIL)/bin/sed.exe
+
+MY_NUL         := NUL
+
+endif
+
+ifeq ($(TYP_OS),unix)
+
+CC              = arm-none-eabi-g++
+OBJCOPY         = arm-none-eabi-objcopy
+OBJDUMP         = arm-none-eabi-objdump
+READELF         = arm-none-eabi-readelf
+
+MAKE            = make
+ECHO            = echo
+RM              = rm
+MKDIR           = mkdir
+SED             = sed
+
+MY_NUL         := /dev/null
+
+endif
+
+#------------------------------------------------------------------------------
+# Toolchain flags
+#------------------------------------------------------------------------------
+
+WFLAGS         = -Wall                                                     \
+                 -Wextra                                                   \
+                 -Wpedantic                                                \
+                 -Wmain                                                    \
+                 -Wundef                                                   \
+                 -Wconversion                                              \
+                 -Wsign-conversion                                         \
+                 -Wunused-parameter                                        \
+                 -Wuninitialized                                           \
+                 -Wmissing-declarations                                    \
+                 -Wshadow                                                  \
+                 -Wunreachable-code                                        \
+                 -Wswitch-default                                          \
+                 -Wswitch-enum                                             \
+                 -Wcast-align                                              \
+                 -Wmissing-include-dirs                                    \
+                 -Winit-self                                               \
+                 -Wfloat-equal                                             \
+                 -Wdouble-promotion                                        \
+                 -Wno-comment
+
+CFLAGS         = -O0                                                       \
+                 $(WFLAGS)                                                 \
+                 -mcpu=cortex-m4                                           \
+                 -mtune=cortex-m4                                          \
+                 -mthumb                                                   \
+                 -mfloat-abi=hard                                          \
+                 -mfpu=fpv4-sp-d16                                         \
+                 -ffast-math                                               \
+                 -mno-unaligned-access                                     \
+                 -mno-long-calls                                           \
+                 -ffast-math                                               \
+                 -fno-inline-functions                                     \
+                 -g                                                        \
+                 -gdwarf-2                                                 \
+                 -fno-exceptions                                           \
+                 -ffunction-sections                                       \
+                 -fdata-sections                                           \
+                 -MMD -MF $(PATH_OBJ)/$(basename $(@F)).d                  \
+                 -I$(PATH_SRC)
+
+CPPFLAGS       = $(CFLAGS)                                                 \
+                 -fno-rtti                                                 \
+                 -fno-use-cxa-atexit                                       \
+                 -fno-nonansi-builtins                                     \
+                 -fno-threadsafe-statics                                   \
+                 -fno-enforce-eh-specs                                     \
+                 -ftemplate-depth=128                                      \
+                 -Wzero-as-null-pointer-constant
+
+
+LDFLAGS        = $(CPPFLAGS)                                               \
+                 -nostdlib                                                 \
+                 -nostartfiles                                             \
+                 -specs=nano.specs                                         \
+                 -specs=nosys.specs                                        \
+                 -T $(PATH_MAKE)/stm32f446re.ld                            \
+                 -Wl,--print-memory-usage                                  \
+                 -Wl,-Map,$(PATH_BIN)/stm32f446re.map
+
+
+#------------------------------------------------------------------------------
+# Source files
+#------------------------------------------------------------------------------
+
+SRC_FILES      = $(PATH_SRC)/App/App                                            \
+                 $(PATH_SRC)/App/IntVect                                        \
+                 $(PATH_SRC)/App/SysStartup                                     \
+                 $(PATH_SRC)/Mcal/Gpio                                          \
+                 $(PATH_SRC)/Mcal/Gpt                                           \
+                 $(PATH_SRC)/Mcal/Mcu                                           \
+                 $(PATH_SRC)/OS/Os
+
+
+#------------------------------------------------------------------------------
+# Dependencies and targets
+#------------------------------------------------------------------------------
+
+VPATH := $(subst \,/,$(sort $(dir $(SRC_FILES)) $(PATH_OBJ)))
+
+FILES_O := $(addprefix $(PATH_OBJ)/, $(notdir $(addsuffix .o, $(SRC_FILES))))
+
+#------------------------------------------------------------------------------
+# Build targets
+#------------------------------------------------------------------------------
+
+all : clean_all print_version $(PATH_BIN)/Stm32f446re.elf
+
+.PHONY : clean_all
+clean_all :
+	@-$(ECHO) +++ cleaning all
+	@-$(MKDIR) -p $(PATH_BIN)
+	@-$(MKDIR) -p $(PATH_OBJ)
+	@-$(RM) -r $(PATH_BIN) 2>$(MY_NUL)
+	@-$(RM) -r $(PATH_OBJ) 2>$(MY_NUL)
+	@-$(MKDIR) -p $(PATH_BIN)
+	@-$(MKDIR) -p $(PATH_OBJ)
+	@-$(ECHO)
+
+.PHONY : print_version
+print_version :
+	@$(ECHO) +++ print GNUmake version
+	@$(MAKE) --version
+	@$(ECHO)
+	@$(ECHO) +++ print GCC version
+	@$(CC) -v
+	@$(ECHO)
+
+$(PATH_BIN)/Stm32f446re.elf : $(FILES_O)
+	@-$(ECHO)
+	@-$(ECHO) +++ linking application to absolute object file $(PATH_BIN)/stm32f446re.elf
+	@-$(CC) -x none $(LDFLAGS) $(FILES_O) -o $(PATH_BIN)/stm32f446re.elf
+	@-$(ECHO)
+	@-$(ECHO) +++ create HEX-file $(PATH_BIN)/stm32f446re.hex
+	@-$(OBJCOPY) $(PATH_BIN)/stm32f446re.elf -O ihex $(PATH_BIN)/stm32f446re.hex
+	@-$(ECHO) +++ create list file $(PATH_BIN)/stm32f446re.list
+	@-$(OBJDUMP) $(PATH_BIN)/stm32f446re.elf -d > $(PATH_BIN)/stm32f446re.list
+	@-$(ECHO) +++ create symbols with readelf in $(PATH_BIN)/stm32f446re.readelf
+	@-$(READELF) $(PATH_BIN)/stm32f446re.elf -a > $(PATH_BIN)/stm32f446re.readelf
+
+#------------------------------------------------------------------------------
+# Pattern rules
+#------------------------------------------------------------------------------
+
+$(PATH_OBJ)/%.o : %.c
+	@-$(ECHO) +++ compile: $(subst \,/,$<) to $(subst \,/,$@)
+	@-$(CC) -x c -std=c11 $(CFLAGS) -c $< -o $(PATH_OBJ)/$(basename $(@F)).o 2> $(PATH_OBJ)/$(basename $(@F)).err
+	@-$(SED) -e 's|.h:\([0-9]*\),|.h(\1) :|' -e 's|:\([0-9]*\):|(\1) :|' $(PATH_OBJ)/$(basename $(@F)).err
+
+$(PATH_OBJ)/%.o : %.cpp
+	@-$(ECHO) +++ compile: $(subst \,/,$<) to $(subst \,/,$@)
+	@-$(CC) -x c++ -std=c++2a $(CPPFLAGS) -c $< -o $(PATH_OBJ)/$(basename $(@F)).o 2> $(PATH_OBJ)/$(basename $(@F)).err
+	@-$(SED) -e 's|.h:\([0-9]*\),|.h(\1) :|' -e 's|:\([0-9]*\):|(\1) :|' $(PATH_OBJ)/$(basename $(@F)).err
