@@ -6,7 +6,7 @@
   /* Thread Control Block (TCB) */
   typedef struct
   {
-    void *sp; /* stack pointer */
+    void *MyStckPointer; /* stack pointer */
   } OSThread;
 
   typedef void (*OSThreadHandler)();
@@ -24,7 +24,7 @@
   /* callback to configure and start interrupts */
   void OS_OnStartup(void);
 
-  void OSThread_Start( OSThread *me, OSThreadHandler threadHandler, void *stkSto, uint32_t stkSize);
+  void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStorage, uint32_t StkSize);
 
 
 #endif /* OS_2023_08_23_H */
