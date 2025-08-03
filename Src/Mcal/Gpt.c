@@ -1,29 +1,30 @@
+#include <Mcal/Gpio.h>
 #include <Mcal/Gpt.h>
 #include <Mcal/Mcu.h>
 #include <OS/Os.h>
 
-static Gpt_ValueType my_millisec_counter;
-static uint32_t  volatile l_tickCtr;
-
-uint32_t BSP_tickCtr(void);
+static Gpt_ValueType millisec_counter;
 
 Gpt_ValueType Gpt_GetTimeElapsed(const Gpt_ChannelType DummyChannelIndex)
 {
   (void) DummyChannelIndex;
 
-  return my_millisec_counter;
+  return millisec_counter;
 }
 
 void SysTick_Handler(void);
 
 void SysTick_Handler(void)
 {
-  ++my_millisec_counter;
-  ++l_tickCtr;
+  PC2_On();
+
+  ++millisec_counter;
 
   __disable_irq();
   OS_Sched();
   __enable_irq();
+
+  PC2_Off();
 }
 
 

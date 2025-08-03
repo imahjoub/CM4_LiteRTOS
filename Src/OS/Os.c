@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "Mcal/Mcu.h"
 #include "Os.h"
 
 __attribute__ ((naked)) void PendSV_Handler(void);
@@ -13,7 +14,7 @@ uint8_t   OS_CurrIdx;          /* current thread index for round robin schedulin
 void OS_Init(void)
 {
   /* set the PendSV interrupt priority to the lowest level 0xFF */
-  *(uint32_t volatile *)0xE000ED20 |= (0xFFU << 16);
+  NVIC_SYS_PRI3_R |= (0xFFUL << 16U);
 }
 
 void OS_Sched(void)
@@ -31,7 +32,7 @@ void OS_Sched(void)
   /* trigger PendSV, if needed */
   if(OS_Next != OS_Curr)
   {
-    *(uint32_t volatile *)0xE000ED04 = (1UL << 28U);
+    ICSR |= (1UL << 28U);
   }
 }
 

@@ -94,9 +94,9 @@ int main(void)
 
   /* Fabricate Cortex-M ISR stack frame for Toggle-PC3 */
   OSThread_Start(&TogglePC3_Thread,
-                  &TogglePC3_Main,
-                  TogglePC3_Stack,
-                  sizeof(TogglePC3_Stack));
+                 &TogglePC3_Main,
+                 TogglePC3_Stack,
+                 sizeof(TogglePC3_Stack));
 
   /* Run Os */
   OS_Run();

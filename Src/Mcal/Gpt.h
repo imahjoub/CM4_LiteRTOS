@@ -19,7 +19,5 @@
     return ((Gpt_GetTimeElapsed(0U) > MyTimer) ? true : false);
   }
 
-  void BSP_delay(uint32_t ticks);
-
 
 #endif /* GPT_2023_08_23_H */

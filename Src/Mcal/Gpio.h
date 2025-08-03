@@ -12,6 +12,8 @@
 
   void Led_On    (void);
   void Led_Off   (void);
+  void PC2_On    (void);
+  void PC2_Off   (void);
   void PC3_On    (void);
   void PC3_Off   (void);
   void Led_Blinky(void);

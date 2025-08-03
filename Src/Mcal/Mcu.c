@@ -5,8 +5,6 @@
 #include <Mcal/Gpio.h>
 
 /* Defines */
-#define BUTTON_EXTI_LINE     13U
-#define NVIC_EXTI15_10_IRQ   40U  /* EXTI lines 10 to 15 use this IRQ */
 
 void SystemInit(void)
 {
@@ -78,6 +76,7 @@ void SetSysClock(void)
   }
 }
 
+
 void SysTick_Init(void)
 {
   /* Reset the SysTick control register. */
@@ -100,19 +99,26 @@ void SysTick_Init(void)
 }
 
 
-void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+void NVIC_SetPriority(int32_t IRQn, uint32_t Priority)
 {
-  /* set Priority for Cortex-M  System Interrupts */
-  if(IRQn < 0)
+  /* Shift for top 4 bits */
+  uint8_t Prio_Val = (Priority & 0xFU) << 4U;
+
+  if(IRQn < (int32_t)0U)
   {
-    SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff);
+    /* System Exceptions: map IRQn to SHP registers */
+    uint32_t RegAddr           = 0xE000ED18UL + (((IRQn & (int32_t)0xFU) - 4U) * 1U); // 1 byte per priority field
+    volatile uint8_t *Prio_Ptr = (volatile uint8_t *)RegAddr;
+    *Prio_Ptr                  = Prio_Val;
   }
-  /* set Priority for device specific Interrupts  */
   else
   {
-    NVIC->IP[(uint32_t)(IRQn)] = ((priority << (8 - __NVIC_PRIO_BITS)) & 0xff);
+    /* Peripheral IRQs */
+    volatile uint8_t *Prio_Ptr = (volatile uint8_t *)(NVIC_IPR_BASE + (uint32_t)IRQn);
+    *Prio_Ptr                  = Prio_Val;
   }
 }
+
 
 
 inline void __enable_irq(void)
