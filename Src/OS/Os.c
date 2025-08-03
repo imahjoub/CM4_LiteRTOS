@@ -99,50 +99,50 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   ++OS_ThreadNum;
 }
 
-/* inline assembly syntax for Compiler 6 (ARMCLANG) */
 __attribute__ ((naked)) void PendSV_Handler(void)
 {
   __asm volatile
   (
-    /* __disable_irq(); */
-    "  CPSID         I                 \n"
+           /* __disable_irq(); */
+    "  CPSID         I                  \n"
 
     /* if (OS_curr != (OSThread *)0) { */
-    "  LDR           r1,=OS_Curr       \n"
-    "  LDR           r1,[r1,#0x00]     \n"
-    "  CMP           r1,#0             \n"
-    "  BEQ           PendSV_restore    \n"
+    "  LDR           r1,=OS_Curr      \n"
+    "  LDR           r1,[r1,#0x00]    \n"
+    "  CMP           r1,#0            \n"
+    "  BEQ           PendSV_restore   \n"
 
-    /*     push registers r4-r11 on the stack */
-    "  PUSH          {r4-r11}          \n"
+    /* push registers r4-r11 on the stack  */
+    "  PUSH          {r4-r11}           \n"
 
-    /*     OS_curr->sp = sp; */
-    "  LDR           r1,=OS_Curr       \n"
-    "  LDR           r1,[r1,#0x00]     \n"
-    "  MOV           r0,sp             \n"
-    "  STR           r0,[r1,#0x00]     \n"
-    /* } */
+         /* OS_curr->sp = sp; */
+    "  LDR           r1,=OS_Curr      \n"
+    "  LDR           r1,[r1,#0x00]    \n"
+    "  MOV           r0,sp            \n"
+    "  STR           r0,[r1,#0x00]    \n"
 
-    "PendSV_restore:                   \n"
-    /* sp = OS_next->sp; */
-    "  LDR           r1,=OS_Next       \n"
-    "  LDR           r1,[r1,#0x00]     \n"
-    "  LDR           r0,[r1,#0x00]     \n"
-    "  MOV           sp,r0             \n"
+                /* } */
+    "PendSV_restore:                  \n"
 
-    /* OS_curr = OS_next; */
-    "  LDR           r1,=OS_Next       \n"
-    "  LDR           r1,[r1,#0x00]     \n"
-    "  LDR           r2,=OS_Curr       \n"
-    "  STR           r1,[r2,#0x00]     \n"
+        /* sp = OS_next->sp; */
+    "  LDR           r1,=OS_Next      \n"
+    "  LDR           r1,[r1,#0x00]    \n"
+    "  LDR           r0,[r1,#0x00]    \n"
+    "  MOV           sp,r0            \n"
 
-    /* pop registers r4-r11 */
-    "  POP           {r4-r11}          \n"
+        /* OS_curr = OS_next; */
+    "  LDR           r1,=OS_Next     \n"
+    "  LDR           r1,[r1,#0x00]   \n"
+    "  LDR           r2,=OS_Curr     \n"
+    "  STR           r1,[r2,#0x00]   \n"
 
-    /* __enable_irq(); */
-    "  CPSIE         I                 \n"
+       /* pop registers r4-r11 */
+    "  POP           {r4-r11}        \n"
 
-    /* return to the next thread */
-    "  BX            lr                \n"
+         /* __enable_irq(); */
+    "  CPSIE         I               \n"
+
+       /* return to the next thread */
+    "  BX            lr              \n"
   );
 }
