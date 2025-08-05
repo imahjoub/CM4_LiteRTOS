@@ -243,8 +243,8 @@
   void SystemInit   (void);
   void SetSysClock  (void);
   void SysTick_Init (void);
-  void __enable_irq (void);
-  void __disable_irq(void);
+  void Enable_Irq   (void);
+  void Disable_Irq  (void);
   void NVIC_SetPriority(int32_t IRQn, uint32_t priority);
 
 #endif // MCU_2023_08_19_H

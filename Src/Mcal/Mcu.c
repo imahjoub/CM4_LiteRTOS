@@ -121,14 +121,14 @@ void NVIC_SetPriority(int32_t IRQn, uint32_t Priority)
 
 
 
-inline void __enable_irq(void)
+inline void Enable_Irq(void)
 {
-  __asm volatile ("cpsie i" ::: "memory");
+  __asm volatile ("cpsie i");
 }
 
-inline void __disable_irq(void)
+inline void Disable_Irq(void)
 {
-  __asm volatile ("cpsid i" ::: "memory");
+  __asm volatile ("cpsid i");
 }
 
 

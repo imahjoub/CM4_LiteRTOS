@@ -47,11 +47,12 @@ void OS_OnIdle(void)
 void OS_Run(void)
 {
   /* callback to configure and start interrupts */
+  /* TBD get rid of this function OS_OnStartup */
   OS_OnStartup();
 
-  __asm volatile ("cpsid i");
+  Disable_Irq();
   OS_Sched();
-  __asm volatile ("cpsie i");
+  Enable_Irq();
 }
 
 void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStorage, uint32_t StkSize)
@@ -61,9 +62,9 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   */
   uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8) * 8);
 
-  uint32_t *stk_limit;
+  uint32_t *Stk_Limit;
 
-  *(--StckPointer) = (1U << 24);              /* xPSR */
+  *(--StckPointer) = (1UL << 24U);            /* xPSR */
   *(--StckPointer) = (uint32_t)ThreadHandler; /* PC   */
   *(--StckPointer) = 0x0000000EU;             /* LR   */
   *(--StckPointer) = 0x0000000CU;             /* R12  */
@@ -71,6 +72,7 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   *(--StckPointer) = 0x00000002U;             /* R2   */
   *(--StckPointer) = 0x00000001U;             /* R1   */
   *(--StckPointer) = 0x00000000U;             /* R0   */
+
   /* additionally, fake registers R4-R11     */
   *(--StckPointer) = 0x0000000BU;             /* R11  */
   *(--StckPointer) = 0x0000000AU;             /* R10  */
@@ -85,12 +87,12 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   TCB->MyStckPointer = StckPointer;
 
   /* round up the bottom of the stack to the 8-byte boundary */
-  stk_limit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
+  Stk_Limit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
 
   /* pre-fill the unused part of the stack with 0xDEADBEEF */
-  for (StckPointer = StckPointer - 1U; StckPointer >= stk_limit; --StckPointer)
+  for (StckPointer = StckPointer - 1U; StckPointer >= Stk_Limit; --StckPointer)
   {
-    *StckPointer = 0xDEADBEEFU;
+    *StckPointer = 0xDEADBEEFUL;
   }
 
   /* register the thread with the OS */
@@ -103,7 +105,7 @@ __attribute__ ((naked)) void PendSV_Handler(void)
 {
   __asm volatile
   (
-           /* __disable_irq(); */
+           /* Disable_Irq(); */
     "  CPSID         I                  \n"
 
     /* if (OS_curr != (OSThread *)0) { */
@@ -139,7 +141,7 @@ __attribute__ ((naked)) void PendSV_Handler(void)
        /* pop registers r4-r11 */
     "  POP           {r4-r11}        \n"
 
-         /* __enable_irq(); */
+         /* Enable_Irq(); */
     "  CPSIE         I               \n"
 
        /* return to the next thread */

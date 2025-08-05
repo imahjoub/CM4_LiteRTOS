@@ -36,13 +36,13 @@ void TogglePC3_Main (void);
 
 void Blinky_Main(void)
 {
-  DelayTimerLED = TimerStart(1000U);
+  DelayTimerLED = TimerStart(900U);
 
   while(1U)
   {
     if(TimerTimeout(DelayTimerLED))
     {
-      DelayTimerLED = TimerStart(1000U);
+      DelayTimerLED = TimerStart(900U);
       Led_Blinky();
     }
   }
