@@ -7,13 +7,20 @@
   typedef struct
   {
     void *MyStckPointer; /* stack pointer */
+    uint32_t TimeOut;    /* timeout delay down-counter */
   } OSThread;
 
   typedef void (*OSThreadHandler)();
 
-  void OS_Init(void);
+  void OS_Init(void *StkStorage, uint32_t StkSize);
 
   void OS_OnIdle(void);
+
+  /* blocking delay */
+  void OS_Delay(uint32_t Ticks);
+
+  /* process all timeouts */
+  void OS_Tick(void);
 
   /* this function must be called with interrupts DISABLED */
   void OS_Sched(void);

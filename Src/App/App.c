@@ -13,11 +13,10 @@
 /***********************************************************************/
 /*                         Global Variables                            */
 /***********************************************************************/
-static   uint64_t DelayTimerLED;
-static   uint64_t DelayTimerPC3;
 
-uint32_t Blinky_Stack   [40U];
-uint32_t TogglePC3_Stack[40U];
+uint32_t Blinky_Stack    [40U];
+uint32_t TogglePC3_Stack [40U];
+uint32_t IdleThread_Stack[40U];
 
 OSThread Blinky_Thread;
 OSThread TogglePC3_Thread;
@@ -29,22 +28,18 @@ void Blinky_Main    (void);
 void TogglePC3_Main (void);
 
 
-
 /***********************************************************************/
 /*                        Functions Definition                         */
 /***********************************************************************/
 
 void Blinky_Main(void)
 {
-  DelayTimerLED = TimerStart(900U);
-
   while(1U)
   {
-    if(TimerTimeout(DelayTimerLED))
-    {
-      DelayTimerLED = TimerStart(900U);
-      Led_Blinky();
-    }
+    Led_On();
+    OS_Delay(300U);
+    Led_Off();
+    OS_Delay(300U);
   }
 }
 
@@ -52,17 +47,13 @@ void Blinky_Main(void)
 
 void TogglePC3_Main(void)
 {
-  DelayTimerPC3 = TimerStart(500U);
-
   while(1U)
   {
-    if(TimerTimeout(DelayTimerPC3))
-    {
-      DelayTimerPC3 = TimerStart(500U);
-      PC3_Toggle();
-    }
+    PC3_On();
+    OS_Delay(200U);
+    PC3_Off();
+    OS_Delay(200U);
   }
-
 }
 
 
@@ -83,7 +74,7 @@ int main(void)
   GPIO_Init();
 
   /* Os Initialization */
-  OS_Init();
+  OS_Init(IdleThread_Stack, sizeof(IdleThread_Stack));
 
   /* Fabricate Cortex-M ISR stack frame for blinky1 */
   OSThread_Start(&Blinky_Thread,

@@ -3,45 +3,110 @@
 #include "Os.h"
 
 __attribute__ ((naked)) void PendSV_Handler(void);
+void IdleThread_Main();
 
-OSThread * volatile OS_Curr; /* pointer to the current thread */
+OSThread * volatile OS_Curr; /* pointer to the current thread     */
 OSThread * volatile OS_Next; /* pointer to the next thread to run */
 
-OSThread *OS_Thread[32U + 1U]; /* array of threads started so far */
-uint8_t   OS_ThreadNum;        /* number of threads started so far */
+OSThread *OS_Thread[32U + 1U]; /* array of threads started so far                 */
+uint8_t   OS_ThreadNum;        /* number of threads started so far                */
 uint8_t   OS_CurrIdx;          /* current thread index for round robin scheduling */
+uint32_t  OS_ReadySet;         /* bitmask of threads that are ready to run        */
 
-void OS_Init(void)
+OSThread Idle_Thread;
+void IdleThread_Main()
+{
+  while(1U)
+  {
+    OS_OnIdle();
+  }
+}
+
+
+void OS_Init(void *StkStorage, uint32_t StkSize)
 {
   /* set the PendSV interrupt priority to the lowest level 0xFF */
   NVIC_SYS_PRI3_R |= (0xFFUL << 16U);
+
+  /* start idleThread thread */
+  OSThread_Start(&Idle_Thread,
+                 &IdleThread_Main,
+                 StkStorage,
+                 StkSize);
 }
 
 void OS_Sched(void)
 {
   /* OS_next = ... */
-  ++OS_CurrIdx;
-
-  if(OS_CurrIdx == OS_ThreadNum)
+  /* idle condition? */
+  if (OS_ReadySet == 0U)
   {
-    OS_CurrIdx = 0U;
+    OS_CurrIdx = 0U; /* index of the idle thread */
   }
+  else
+  {
+    do
+    {
+      ++OS_CurrIdx;
 
-  OS_Next = OS_Thread[OS_CurrIdx];
+      if (OS_CurrIdx == OS_ThreadNum)
+      {
+        OS_CurrIdx = 1U;
+      }
+    }
+    while ((OS_ReadySet & (1U << (OS_CurrIdx - 1U))) == 0U);
+  }
+  /* temporarty for the next thread */
+  OSThread * const next = OS_Thread[OS_CurrIdx];
 
   /* trigger PendSV, if needed */
-  if(OS_Next != OS_Curr)
+  if (next != OS_Curr)
   {
+    OS_Next = next;
     ICSR |= (1UL << 28U);
   }
 }
 
 void OS_OnIdle(void)
 {
-#ifdef NDBEBUG
-  __WFI(); /* stop the CPU and Wait for Interrupt */
-#endif
+  /* stop the CPU and Wait for Interrupt */
+  WaitForIrq();
 }
+
+
+void OS_Delay(uint32_t Ticks)
+{
+  Disable_Irq();
+
+  /* never call OS_delay from the idleThread */
+  /* TBD add the following check */
+  //Q_REQUIRE(OS_curr != OS_thread[0]);
+
+  OS_Curr->TimeOut = Ticks;
+
+  OS_ReadySet &= (uint32_t)(~(1UL << (OS_CurrIdx - 1U)));
+
+  OS_Sched();
+
+  Enable_Irq();
+}
+
+void OS_Tick(void)
+{
+  for(uint8_t i = 1U; i < OS_ThreadNum; ++i)
+  {
+    if(OS_Thread[i]->TimeOut != 0U)
+    {
+      --OS_Thread[i]->TimeOut;
+
+      if(OS_Thread[i]->TimeOut == 0U)
+      {
+        OS_ReadySet |= (1U << (i - 1U));
+      }
+    }
+  }
+}
+
 
 
 void OS_Run(void)
@@ -60,7 +125,7 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   /* round down the stack top to the 8-byte boundary
   * NOTE: ARM Cortex-M stack grows down from hi -> low memory
   */
-  uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8) * 8);
+  uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8U) * 8U);
 
   uint32_t *Stk_Limit;
 
@@ -97,6 +162,12 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
 
   /* register the thread with the OS */
   OS_Thread[OS_ThreadNum] = TCB;
+
+  /* make the thread ready to run */
+  if(OS_ThreadNum > 0U)
+  {
+    OS_ReadySet |= (1U << (OS_ThreadNum - 1U));
+  }
 
   ++OS_ThreadNum;
 }

@@ -20,6 +20,8 @@ void SysTick_Handler(void)
 
   ++millisec_counter;
 
+  OS_Tick();
+
   Disable_Irq();
   OS_Sched();
   Enable_Irq();

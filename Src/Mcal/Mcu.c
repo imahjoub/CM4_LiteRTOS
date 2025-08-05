@@ -131,6 +131,8 @@ inline void Disable_Irq(void)
   __asm volatile ("cpsid i");
 }
 
-
-
+inline void WaitForIrq(void)
+{
+  __asm volatile ("wfi");
+}
 
