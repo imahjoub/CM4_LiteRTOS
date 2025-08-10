@@ -240,12 +240,13 @@
 
 
   /* Functions prototypes */
-  void SystemInit      (void);
-  void SetSysClock     (void);
-  void SysTick_Init    (void);
-  void Enable_Irq      (void);
-  void Disable_Irq     (void);
-  void WaitForIrq      (void);
+  void SystemInit        (void);
+  void SetSysClock       (void);
+  void SysTick_Init      (void);
+  void Enable_Irq        (void);
+  void Disable_Irq       (void);
+  void Wait_For_Interrupt(void);
+
   void NVIC_SetPriority(int32_t IRQn, uint32_t priority);
 
 #endif // MCU_2023_08_19_H

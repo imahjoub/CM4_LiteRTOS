@@ -1,4 +1,5 @@
 #include "Gpio.h"
+#include "OS/Os.h"
 
 void GPIO_Init(void)
 {
@@ -16,6 +17,10 @@ void GPIO_Init(void)
   /* Set PC2 as output */
   GPIOC_MODER &= (uint32_t)(~(3U << (2U * 2U)));
   GPIOC_MODER |= (uint32_t)  (1U << (2U * 2U));
+
+  /* Set PC10 as output */
+  GPIOC_MODER &= (uint32_t)(~(3U << (10U * 2U)));
+  GPIOC_MODER |= (uint32_t)  (1U << (10U * 2U));
 }
 
 
@@ -23,6 +28,7 @@ void Led_Blinky(void)
 {
   /* Toggle the LED pin */
   GPIOA_ODR ^= (1UL << 5U);
+  OS_Delay(200U);
 }
 
 void Led_On(void)
@@ -41,6 +47,7 @@ void PC3_Toggle(void)
 {
   /* Toggle the LED pin */
   GPIOC_ODR ^= (1UL << 3U);
+  OS_Delay(300U);
 }
 
 void PC3_On(void)
@@ -62,3 +69,14 @@ void PC2_On(void)
 {
   GPIOC_ODR |= (uint32_t)(1UL << 2U);
 }
+
+void PC10_On(void)
+{
+  GPIOC_ODR |= (uint32_t)(1UL << 10U);
+}
+
+void PC10_Off(void)
+{
+  GPIOC_ODR &= (uint32_t)(~(1UL << 10U));
+}
+

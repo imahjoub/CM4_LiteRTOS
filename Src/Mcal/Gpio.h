@@ -16,6 +16,8 @@
   void PC2_Off   (void);
   void PC3_On    (void);
   void PC3_Off   (void);
+  void PC10_On   (void);
+  void PC10_Off  (void);
   void Led_Blinky(void);
   void PC3_Toggle(void);
   void GPIO_Init (void);

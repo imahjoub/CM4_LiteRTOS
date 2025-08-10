@@ -1,20 +1,25 @@
 #include <stdint.h>
+#include "Mcal/Gpio.h"
 #include "Mcal/Mcu.h"
 #include "Os.h"
 
 __attribute__ ((naked)) void PendSV_Handler(void);
-void IdleThread_Main();
+static void IdleThread_Main(void);
 
-OSThread * volatile OS_Curr; /* pointer to the current thread     */
+OSThread * volatile OS_Curr; /* pointer to the current thread */
 OSThread * volatile OS_Next; /* pointer to the next thread to run */
 
-OSThread *OS_Thread[32U + 1U]; /* array of threads started so far                 */
-uint8_t   OS_ThreadNum;        /* number of threads started so far                */
-uint8_t   OS_CurrIdx;          /* current thread index for round robin scheduling */
-uint32_t  OS_ReadySet;         /* bitmask of threads that are ready to run        */
+OSThread  IdleThread;
+OSThread *OS_Thread[32U + 1U]; /* array of threads started so far */
 
-OSThread Idle_Thread;
-void IdleThread_Main()
+uint8_t   OS_CurrIdx;          /* current thread index for round robin scheduling */
+uint32_t  OS_ReadySet;         /* bitmask of threads that are ready to run */
+uint32_t  OS_DelayedSet;       /* bitmask of threads that are delayed */
+
+#define LOG2(x) (32U - (uint32_t)__builtin_clz(x))
+
+
+static void IdleThread_Main(void)
 {
   while(1U)
   {
@@ -23,54 +28,48 @@ void IdleThread_Main()
 }
 
 
-void OS_Init(void *StkStorage, uint32_t StkSize)
+void OS_Init(void *StackStorage, uint32_t SatckSize)
 {
   /* set the PendSV interrupt priority to the lowest level 0xFF */
   NVIC_SYS_PRI3_R |= (0xFFUL << 16U);
 
-  /* start idleThread thread */
-  OSThread_Start(&Idle_Thread,
-                 &IdleThread_Main,
-                 StkStorage,
-                 StkSize);
+  /* start IdleThread thread */
+  OSThread_Start(&IdleThread, 0U, &IdleThread_Main, StackStorage, SatckSize);
 }
 
 void OS_Sched(void)
 {
-  /* OS_next = ... */
+  /* choose the next thread to execute... */
+  OSThread* NextThread;
+
   /* idle condition? */
   if (OS_ReadySet == 0U)
   {
-    OS_CurrIdx = 0U; /* index of the idle thread */
+    NextThread = OS_Thread[0U]; /* the idle thread */
   }
   else
   {
-    do
-    {
-      ++OS_CurrIdx;
-
-      if (OS_CurrIdx == OS_ThreadNum)
-      {
-        OS_CurrIdx = 1U;
-      }
-    }
-    while ((OS_ReadySet & (1U << (OS_CurrIdx - 1U))) == 0U);
+    NextThread = OS_Thread[LOG2(OS_ReadySet)];
   }
+
   /* temporarty for the next thread */
-  OSThread * const next = OS_Thread[OS_CurrIdx];
+  //OSThread * const next = OS_Thread[OS_CurrIdx];
 
   /* trigger PendSV, if needed */
-  if (next != OS_Curr)
+  if(NextThread != OS_Curr)
   {
-    OS_Next = next;
-    ICSR |= (1UL << 28U);
+    OS_Next  = NextThread;
+    ICSR    |= (1UL << 28U);
   }
 }
 
 void OS_OnIdle(void)
 {
+  PC10_On();
+  PC10_Off();
+
   /* stop the CPU and Wait for Interrupt */
-  WaitForIrq();
+  //Wait_For_Interrupt();
 }
 
 
@@ -78,13 +77,13 @@ void OS_Delay(uint32_t Ticks)
 {
   Disable_Irq();
 
-  /* never call OS_delay from the idleThread */
-  /* TBD add the following check */
+  /* TBD never call OS_delay from the idleThread */
   //Q_REQUIRE(OS_curr != OS_thread[0]);
 
   OS_Curr->TimeOut = Ticks;
 
-  OS_ReadySet &= (uint32_t)(~(1UL << (OS_CurrIdx - 1U)));
+  OS_ReadySet   &= ~(1U << (OS_Curr->Prio - 1U));
+  OS_DelayedSet |=  (1U << (OS_Curr->Prio - 1U));
 
   OS_Sched();
 
@@ -93,26 +92,31 @@ void OS_Delay(uint32_t Ticks)
 
 void OS_Tick(void)
 {
-  for(uint8_t i = 1U; i < OS_ThreadNum; ++i)
-  {
-    if(OS_Thread[i]->TimeOut != 0U)
-    {
-      --OS_Thread[i]->TimeOut;
+  uint32_t workingSet = OS_DelayedSet;
 
-      if(OS_Thread[i]->TimeOut == 0U)
-      {
-        OS_ReadySet |= (1U << (i - 1U));
-      }
+  while (workingSet != 0U)
+  {
+    OSThread* LocalThread = OS_Thread[LOG2(workingSet)];
+    uint32_t bit;
+
+    bit = (1U << (LocalThread->Prio - 1U));
+
+    --LocalThread->TimeOut;
+
+    if (LocalThread->TimeOut == 0U)
+    {
+      OS_ReadySet   |=  bit;  /* insert to set */
+      OS_DelayedSet &= ~bit;  /* remove from set */
     }
+
+    workingSet &= ~bit;      /* remove from working set */
   }
 }
-
 
 
 void OS_Run(void)
 {
   /* callback to configure and start interrupts */
-  /* TBD get rid of this function OS_OnStartup */
   OS_OnStartup();
 
   Disable_Irq();
@@ -120,16 +124,16 @@ void OS_Run(void)
   Enable_Irq();
 }
 
-void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStorage, uint32_t StkSize)
+void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, void *StkStorage, uint32_t StkSize)
 {
   /* round down the stack top to the 8-byte boundary
   * NOTE: ARM Cortex-M stack grows down from hi -> low memory
   */
-  uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8U) * 8U);
+  uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8) * 8);
 
-  uint32_t *Stk_Limit;
+  uint32_t *stk_limit;
 
-  *(--StckPointer) = (1UL << 24U);            /* xPSR */
+  *(--StckPointer) = (1U << 24);              /* xPSR */
   *(--StckPointer) = (uint32_t)ThreadHandler; /* PC   */
   *(--StckPointer) = 0x0000000EU;             /* LR   */
   *(--StckPointer) = 0x0000000CU;             /* R12  */
@@ -137,7 +141,6 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   *(--StckPointer) = 0x00000002U;             /* R2   */
   *(--StckPointer) = 0x00000001U;             /* R1   */
   *(--StckPointer) = 0x00000000U;             /* R0   */
-
   /* additionally, fake registers R4-R11     */
   *(--StckPointer) = 0x0000000BU;             /* R11  */
   *(--StckPointer) = 0x0000000AU;             /* R10  */
@@ -152,24 +155,24 @@ void OSThread_Start(OSThread *TCB, OSThreadHandler ThreadHandler, void *StkStora
   TCB->MyStckPointer = StckPointer;
 
   /* round up the bottom of the stack to the 8-byte boundary */
-  Stk_Limit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
+  stk_limit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
 
   /* pre-fill the unused part of the stack with 0xDEADBEEF */
-  for (StckPointer = StckPointer - 1U; StckPointer >= Stk_Limit; --StckPointer)
+  for (StckPointer = StckPointer - 1U; StckPointer >= stk_limit; --StckPointer)
   {
-    *StckPointer = 0xDEADBEEFUL;
+    *StckPointer = 0xDEADBEEFU;
   }
 
   /* register the thread with the OS */
-  OS_Thread[OS_ThreadNum] = TCB;
+  OS_Thread[Prio] = TCB;
+  TCB->Prio       = Prio;
 
   /* make the thread ready to run */
-  if(OS_ThreadNum > 0U)
+  if(Prio > 0U)
   {
-    OS_ReadySet |= (1U << (OS_ThreadNum - 1U));
+    OS_ReadySet |= (1U << (Prio - 1U));
   }
 
-  ++OS_ThreadNum;
 }
 
 __attribute__ ((naked)) void PendSV_Handler(void)

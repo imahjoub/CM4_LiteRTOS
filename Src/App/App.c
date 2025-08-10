@@ -13,9 +13,8 @@
 /***********************************************************************/
 /*                         Global Variables                            */
 /***********************************************************************/
-
-uint32_t Blinky_Stack    [40U];
-uint32_t TogglePC3_Stack [40U];
+uint32_t Blinky_Stack   [40U];
+uint32_t TogglePC3_Stack[40U];
 uint32_t IdleThread_Stack[40U];
 
 OSThread Blinky_Thread;
@@ -28,21 +27,20 @@ void Blinky_Main    (void);
 void TogglePC3_Main (void);
 
 
+
 /***********************************************************************/
 /*                        Functions Definition                         */
 /***********************************************************************/
-
 void Blinky_Main(void)
 {
   while(1U)
   {
     Led_On();
-    OS_Delay(300U);
+    OS_Delay(10);
     Led_Off();
-    OS_Delay(300U);
+    OS_Delay(20);
   }
 }
-
 
 
 void TogglePC3_Main(void)
@@ -50,9 +48,9 @@ void TogglePC3_Main(void)
   while(1U)
   {
     PC3_On();
-    OS_Delay(200U);
+    OS_Delay(20);
     PC3_Off();
-    OS_Delay(200U);
+    OS_Delay(40);
   }
 }
 
@@ -78,6 +76,7 @@ int main(void)
 
   /* Fabricate Cortex-M ISR stack frame for blinky1 */
   OSThread_Start(&Blinky_Thread,
+                 3U,
                  &Blinky_Main,
                  Blinky_Stack,
                  sizeof(Blinky_Stack));
@@ -85,6 +84,7 @@ int main(void)
 
   /* Fabricate Cortex-M ISR stack frame for Toggle-PC3 */
   OSThread_Start(&TogglePC3_Thread,
+                 2U,
                  &TogglePC3_Main,
                  TogglePC3_Stack,
                  sizeof(TogglePC3_Stack));

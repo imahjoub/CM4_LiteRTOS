@@ -83,7 +83,9 @@ void SysTick_Init(void)
   STK_CTRL = (uint32_t)0x00000000UL;
 
   /* Set the SysTick reload register to be equivalent to 1ms. */
-  STK_LOAD = (uint32_t)(180000UL);
+  //STK_LOAD = (uint32_t)(180000UL);  /* 1000us(ms) */
+  //STK_LOAD = (uint32_t)(180UL);       /*   1us      here I saw a strange behvior, sytick interrupt too fast it does not let osthread start to happen*/
+  STK_LOAD = (uint32_t)(18000UL);       /*   100us      */
 
   /* Initialize the SysTick counter value (clear it to zero). */
   STK_VAL = (uint32_t)0x00000000UL;
@@ -119,20 +121,21 @@ void NVIC_SetPriority(int32_t IRQn, uint32_t Priority)
   }
 }
 
-
+inline void Wait_For_Interrupt(void)
+{
+  __asm volatile ("wfi":::"memory");
+}
 
 inline void Enable_Irq(void)
 {
-  __asm volatile ("cpsie i");
+  __asm volatile ("cpsie i" ::: "memory");
 }
 
 inline void Disable_Irq(void)
 {
-  __asm volatile ("cpsid i");
+  __asm volatile ("cpsid i" ::: "memory");
 }
 
-inline void WaitForIrq(void)
-{
-  __asm volatile ("wfi");
-}
+
+
 
