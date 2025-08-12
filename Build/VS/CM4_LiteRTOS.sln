@@ -15,6 +15,19 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Make", "Make", "{5F2988E0-5
 		..\Make\make_000.gmk = ..\Make\make_000.gmk
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_doc", "_doc", "{FCFACE89-6A48-45D3-9199-D5809832B44B}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\README.md = ..\..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{CB72102E-155C-496E-8FD9-027A28A494A5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{680BD1D8-62A8-4168-8509-9BFBF9D84D7F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.github\workflows\CM4_LiteRTOS.yml = ..\..\.github\workflows\CM4_LiteRTOS.yml
+		..\..\.github\workflows\CM4_LiteRTOS_CodeQl.yml = ..\..\.github\workflows\CM4_LiteRTOS_CodeQl.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		CM4_LiteRTOS|x64 = CM4_LiteRTOS|x64
@@ -28,6 +41,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5F2988E0-506D-4A9D-8BB6-40D11D584841} = {5FB4B273-0725-4F60-9017-B020EAEA6CA9}
+		{680BD1D8-62A8-4168-8509-9BFBF9D84D7F} = {CB72102E-155C-496E-8FD9-027A28A494A5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB94DEFE-9434-4C4C-B884-D7390C6E0DC7}

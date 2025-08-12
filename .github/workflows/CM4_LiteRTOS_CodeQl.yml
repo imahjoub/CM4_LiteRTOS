@@ -1,0 +1,52 @@
+# -----------------------------------------------------
+#  Copyright Iliass Mahjoub 2023.
+#  Distributed under MIT License
+#  (See accompanying file LICENSE
+#  or copy at http://www.boost.org/LICENSE_1_0.txt)
+# -----------------------------------------------------
+
+name: "CodeQL"
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  analyze:
+    name: Analyze target stm32f446re
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ cpp ]
+        suite:    [ all ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: update-tools
+        run: sudo apt install gcc-arm-none-eabi
+      - name: target-ubuntu-${{ matrix.suite }}
+        working-directory: ./Build/VS
+        run: |
+          make -f ../Make/make_000.gmk ${{ matrix.suite }} TYP_OS=unix TYP_MCU=stm32f446re
+          ls -la ../Bin/CM4_LiteRTOS_x64/cm4_litertos.elf ../Bin/CM4_LiteRTOS_x64/cm4_litertos.hex
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
