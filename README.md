@@ -1,18 +1,18 @@
-# LiteRTOS_CM4
+# CM4_LiteRTOS
 
 <p align="center">
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4/actions">
-        <img src="https://github.com/imahjoub/LiteRTOS_CM4/actions/workflows/LiteRTOS_CM4.yml/badge.svg" alt="Build Status"></a>
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4/actions/workflows/LiteRTOS_CM4_CodeQl.yml">
-        <img src="https://github.com/imahjoub/LiteRTOS_CM4/actions/workflows/LiteRTOS_CM4_CodeQl.yml/badge.svg" alt="CodeQL"></a>
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc">
-        <img src="https://custom-icon-badges.herokuapp.com/github/issues-raw/imahjoub/LiteRTOS_CM4?logo=github" alt="Issues" /></a>
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4/blob/main/LICENSE">
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS/actions">
+        <img src="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS.yml/badge.svg" alt="Build Status"></a>
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS_CodeQl.yml">
+        <img src="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS_CodeQl.yml/badge.svg" alt="CodeQL"></a>
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc">
+        <img src="https://custom-icon-badges.herokuapp.com/github/issues-raw/imahjoub/CM4_LiteRTOS?logo=github" alt="Issues" /></a>
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4" alt="GitHub code size in bytes">
-        <img src="https://img.shields.io/github/languages/code-size/imahjoub/LiteRTOS_CM4" /></a>
-    <a href="https://github.com/imahjoub/LiteRTOS_CM4" alt="Activity">
-        <img src="https://img.shields.io/github/commit-activity/y/imahjoub/LiteRTOS_CM4" /></a>
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS" alt="GitHub code size in bytes">
+        <img src="https://img.shields.io/github/languages/code-size/imahjoub/CM4_LiteRTOS" /></a>
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS" alt="Activity">
+        <img src="https://img.shields.io/github/commit-activity/y/imahjoub/CM4_LiteRTOS" /></a>
 </p>
 
 
