@@ -6,15 +6,15 @@
 __attribute__ ((naked)) void PendSV_Handler(void);
 static void IdleThread_Main(void);
 
-OSThread * volatile OS_Curr; /* pointer to the current thread */
-OSThread * volatile OS_Next; /* pointer to the next thread to run */
+OSThread * volatile OS_Curr;    /* pointer to the current thread */
+OSThread * volatile OS_Next;    /* pointer to the next thread to run */
 
 OSThread  IdleThread;
-OSThread *OS_Thread[32U + 1U]; /* array of threads started so far */
+OSThread *OS_Thread[32U + 1U];  /* array of threads started so far */
 
-uint8_t   OS_CurrIdx;          /* current thread index for round robin scheduling */
-uint32_t  OS_ReadySet;         /* bitmask of threads that are ready to run */
-uint32_t  OS_DelayedSet;       /* bitmask of threads that are delayed */
+uint8_t   OS_CurrIdx;           /* current thread index for round robin scheduling */
+uint32_t  OS_ReadySet;          /* bitmask of threads that are ready to run */
+uint32_t  OS_DelayedSet;        /* bitmask of threads that are delayed */
 
 #define LOG2(x) (32U - (uint32_t)__builtin_clz(x))
 
@@ -73,7 +73,7 @@ void OS_OnIdle(void)
 }
 
 
-void OS_Delay(uint32_t Ticks)
+void OS_msDelay(uint32_t Ticks)
 {
   Disable_Irq();
 
@@ -131,7 +131,7 @@ void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, 
   */
   uint32_t *StckPointer = (uint32_t *)((((uint32_t)StkStorage + StkSize) / 8) * 8);
 
-  uint32_t *stk_limit;
+  uint32_t *StckLimit;
 
   *(--StckPointer) = (1U << 24);              /* xPSR */
   *(--StckPointer) = (uint32_t)ThreadHandler; /* PC   */
@@ -155,10 +155,10 @@ void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, 
   TCB->MyStckPointer = StckPointer;
 
   /* round up the bottom of the stack to the 8-byte boundary */
-  stk_limit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
+  StckLimit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
 
   /* pre-fill the unused part of the stack with 0xDEADBEEF */
-  for (StckPointer = StckPointer - 1U; StckPointer >= stk_limit; --StckPointer)
+  for (StckPointer = StckPointer - 1U; StckPointer >= StckLimit; --StckPointer)
   {
     *StckPointer = 0xDEADBEEFU;
   }

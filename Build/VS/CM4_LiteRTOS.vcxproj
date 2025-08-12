@@ -84,7 +84,7 @@
     <NMakeReBuildCommandLine>..\build.bat all stm32f446re</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>..\build.bat clean stm32f446re</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>__GNUC__=13;__attribute__()=;__STDC_VERSION__=202311L</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)../../Src;$(ProjectDir)../../Src/Target/STM32F446re</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)../../Src;$(ProjectDir)../../Src/Target/STM32F446re;$(IncludePath);</NMakeIncludeSearchPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <BuildLog>

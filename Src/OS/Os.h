@@ -25,7 +25,7 @@
   void OS_Run(void);
 
   /* blocking delay */
-  void OS_Delay(uint32_t Ticks);
+  void OS_msDelay(uint32_t Ticks);
 
   /* process all timeouts */
   void OS_Tick(void);
