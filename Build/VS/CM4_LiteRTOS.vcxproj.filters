@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Src">
+      <UniqueIdentifier>{8d055c20-bc32-4c51-9e5f-d14c2a1c7cda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\App">
+      <UniqueIdentifier>{b2cc3723-ba5b-4522-a1c1-c47b0787cbd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\OS">
+      <UniqueIdentifier>{21d2a64f-6711-42a5-a0f3-ef5d41e7fe76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\Target">
+      <UniqueIdentifier>{a49dbc9e-db0a-4e05-912e-0ccfdca1c33d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\Target\STM32F446re">
+      <UniqueIdentifier>{2ac5df38-de33-46ec-8e4d-89143d061795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\Target\STM32F446re\Mcal">
+      <UniqueIdentifier>{0f62af1e-b11f-4791-9267-2dcca28bb753}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Src\Target\STM32F446re\Make">
+      <UniqueIdentifier>{8f0dd560-6073-47c4-8df1-d26da17e7b30}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Src\App\App.c">
+      <Filter>Source Files\Src\App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\App\SysStartup.c">
+      <Filter>Source Files\Src\App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\App\IntVect.c">
+      <Filter>Source Files\Src\App</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\OS\Os.c">
+      <Filter>Source Files\Src\OS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Gpio.c">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Gpt.c">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Mcu.c">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Src\OS\Os.h">
+      <Filter>Source Files\Src\OS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Gpio.h">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Gpt.h">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Mcu.h">
+      <Filter>Source Files\Src\Target\STM32F446re\Mcal</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Src\Target\STM32F446re\Make\make_stm32f446re.gmk">
+      <Filter>Source Files\Src\Target\STM32F446re\Make</Filter>
+    </None>
+    <None Include="..\..\Src\Target\STM32F446re\Make\stm32f446re.ld">
+      <Filter>Source Files\Src\Target\STM32F446re\Make</Filter>
+    </None>
+  </ItemGroup>
+</Project>

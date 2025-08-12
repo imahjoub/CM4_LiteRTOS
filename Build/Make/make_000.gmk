@@ -1,0 +1,9 @@
+
+
+PATH_ENV        = $(CURDIR)/../../Make
+PATH_SRC        = $(CURDIR)/../../Src
+
+ifeq ($(TYP_MCU),stm32f446re)
+include $(PATH_SRC)/Target/STM32F446re/Make/make_stm32f446re.gmk
+endif
+

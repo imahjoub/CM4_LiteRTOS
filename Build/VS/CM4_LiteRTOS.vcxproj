@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="STM32F446RE_RTOS|x64">
-      <Configuration>STM32F446RE_RTOS</Configuration>
+    <ProjectConfiguration Include="CM4_LiteRTOS|x64">
+      <Configuration>CM4_LiteRTOS</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
@@ -10,16 +10,20 @@
     <ClCompile Include="..\..\Src\App\App.c" />
     <ClCompile Include="..\..\Src\App\IntVect.c" />
     <ClCompile Include="..\..\Src\App\SysStartup.c" />
-    <ClCompile Include="..\..\Src\Mcal\Gpio.c" />
-    <ClCompile Include="..\..\Src\Mcal\Gpt.c" />
-    <ClCompile Include="..\..\Src\Mcal\Mcu.c" />
     <ClCompile Include="..\..\Src\OS\Os.c" />
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Gpio.c" />
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Gpt.c" />
+    <ClCompile Include="..\..\Src\Target\STM32F446re\Mcal\Mcu.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Src\Mcal\Gpio.h" />
-    <ClInclude Include="..\..\Src\Mcal\Gpt.h" />
-    <ClInclude Include="..\..\Src\Mcal\Mcu.h" />
     <ClInclude Include="..\..\Src\OS\Os.h" />
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Gpio.h" />
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Gpt.h" />
+    <ClInclude Include="..\..\Src\Target\STM32F446re\Mcal\Mcu.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Src\Target\STM32F446re\Make\make_stm32f446re.gmk" />
+    <None Include="..\..\Src\Target\STM32F446re\Make\stm32f446re.ld" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -28,19 +32,19 @@
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446_FlashCraft|x64'" Label="Configuration">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'" Label="Configuration">
     <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='STM32F466RE|x64'">
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <PlatformToolset>v142</PlatformToolset>
     <ConfigurationType>Makefile</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='STM32F446RE|x64'">
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <ConfigurationType>Makefile</ConfigurationType>
   </PropertyGroup>
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='STM32F446RE_RTOS|x64'">
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <PlatformToolset>v142</PlatformToolset>
     <ConfigurationType>Makefile</ConfigurationType>
   </PropertyGroup>
@@ -49,11 +53,11 @@
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='STM32F446_FlashCraft|x64'">
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446_FlashCraft|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <NMakeBuildCommandLine>..\build.bat build</NMakeBuildCommandLine>
     <NMakeOutput>
     </NMakeOutput>
@@ -64,7 +68,7 @@
     <IntDir>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\</IntDir>
     <NMakeIncludeSearchPath>$(ProjectDir)../../Src</NMakeIncludeSearchPath>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446RE_RTOS|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <NMakeBuildCommandLine>..\build.bat build</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>..\build.bat all</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>..\build.bat clean</NMakeCleanCommandLine>
@@ -73,26 +77,26 @@
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\</IntDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446RE|x64'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <OutDir>$(SolutionDir)..\Bin\$(Configuration)_$(Platform)\</OutDir>
     <IntDir>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\</IntDir>
-    <NMakeBuildCommandLine>..\build.bat build</NMakeBuildCommandLine>
-    <NMakeReBuildCommandLine>..\build.bat all</NMakeReBuildCommandLine>
-    <NMakeCleanCommandLine>..\build.bat clean</NMakeCleanCommandLine>
+    <NMakeBuildCommandLine>..\build.bat build stm32f446re</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>..\build.bat all stm32f446re</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>..\build.bat clean stm32f446re</NMakeCleanCommandLine>
     <NMakePreprocessorDefinitions>__GNUC__=13;__attribute__()=;__STDC_VERSION__=202311L</NMakePreprocessorDefinitions>
-    <NMakeIncludeSearchPath>$(ProjectDir)../../Src</NMakeIncludeSearchPath>
+    <NMakeIncludeSearchPath>$(ProjectDir)../../Src;$(ProjectDir)../../Src/Target/STM32F446re</NMakeIncludeSearchPath>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446_FlashCraft|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <BuildLog>
       <Path>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\$(Configuration)_BuildLog.htm</Path>
     </BuildLog>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446RE_RTOS|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <BuildLog>
       <Path>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\$(Configuration)_BuildLog.htm</Path>
     </BuildLog>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='STM32F446RE_RTOS|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='CM4_LiteRTOS|x64'">
     <BuildLog>
       <Path>$(SolutionDir)..\Tmp\$(Configuration)_$(Platform)\$(Configuration)_BuildLog.htm</Path>
     </BuildLog>

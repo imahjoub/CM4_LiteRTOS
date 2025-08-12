@@ -36,9 +36,9 @@ void Blinky_Main(void)
   while(1U)
   {
     Led_On();
-    OS_Delay(10);
+    OS_Delay(100);
     Led_Off();
-    OS_Delay(20);
+    OS_Delay(200);
   }
 }
 
@@ -48,9 +48,9 @@ void TogglePC3_Main(void)
   while(1U)
   {
     PC3_On();
-    OS_Delay(20);
+    OS_Delay(200);
     PC3_Off();
-    OS_Delay(40);
+    OS_Delay(400);
   }
 }
 

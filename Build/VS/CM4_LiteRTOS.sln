@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "STM32F446RE_RTOS", "STM32F446RE_RTOS.vcxproj", "{78213875-2517-48FD-B737-2AE54C8A935E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CM4_LiteRTOS", "CM4_LiteRTOS.vcxproj", "{78213875-2517-48FD-B737-2AE54C8A935E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5FB4B273-0725-4F60-9017-B020EAEA6CA9}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,17 +12,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{5FB4B273
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Make", "Make", "{5F2988E0-506D-4A9D-8BB6-40D11D584841}"
 	ProjectSection(SolutionItems) = preProject
-		..\Make\make_stm32f446re.gmk = ..\Make\make_stm32f446re.gmk
-		..\Make\stm32f446re.ld = ..\Make\stm32f446re.ld
+		..\Make\make_000.gmk = ..\Make\make_000.gmk
 	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		STM32F446RE_RTOS|x64 = STM32F446RE_RTOS|x64
+		CM4_LiteRTOS|x64 = CM4_LiteRTOS|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{78213875-2517-48FD-B737-2AE54C8A935E}.STM32F446RE_RTOS|x64.ActiveCfg = STM32F446RE_RTOS|x64
-		{78213875-2517-48FD-B737-2AE54C8A935E}.STM32F446RE_RTOS|x64.Build.0 = STM32F446RE_RTOS|x64
+		{78213875-2517-48FD-B737-2AE54C8A935E}.CM4_LiteRTOS|x64.ActiveCfg = CM4_LiteRTOS|x64
+		{78213875-2517-48FD-B737-2AE54C8A935E}.CM4_LiteRTOS|x64.Build.0 = CM4_LiteRTOS|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

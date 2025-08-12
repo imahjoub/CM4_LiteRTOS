@@ -1,6 +1,16 @@
 #include "Gpio.h"
 #include "OS/Os.h"
 
+#include <stdatomic.h>
+
+atomic_flag port_c_lock = ATOMIC_FLAG_INIT;
+
+//static inline void acquire_port_resource() { Disable_Irq(); }
+//static inline void release_port_resource() { Enable_Irq(); }
+
+static inline void acquire_port_resource() { atomic_flag_test_and_set(&port_c_lock); }
+static inline void release_port_resource() { atomic_flag_clear(&port_c_lock); }
+
 void GPIO_Init(void)
 {
   /* Enable GPIOA and GPIOC clocks */
@@ -43,40 +53,45 @@ void Led_Off(void)
   GPIOA_ODR &= (uint32_t)(~(1UL << 5U));
 }
 
-void PC3_Toggle(void)
-{
-  /* Toggle the LED pin */
-  GPIOC_ODR ^= (1UL << 3U);
-  OS_Delay(300U);
-}
-
 void PC3_On(void)
 {
+  acquire_port_resource();
   GPIOC_ODR |= (uint32_t)(1UL << 3U);
+  release_port_resource();
 }
 
 void PC3_Off(void)
 {
+  acquire_port_resource();
   GPIOC_ODR &= (uint32_t)(~(1UL << 3));
+  release_port_resource();
 }
 
 void PC2_Off(void)
 {
+  acquire_port_resource();
   GPIOC_ODR &= (uint32_t)(~(1UL << 2U));
+  release_port_resource();
 }
 
 void PC2_On(void)
 {
+  acquire_port_resource();
   GPIOC_ODR |= (uint32_t)(1UL << 2U);
+  release_port_resource();
 }
 
 void PC10_On(void)
 {
+  acquire_port_resource();
   GPIOC_ODR |= (uint32_t)(1UL << 10U);
+  release_port_resource();
 }
 
 void PC10_Off(void)
 {
+  acquire_port_resource();
   GPIOC_ODR &= (uint32_t)(~(1UL << 10U));
+  release_port_resource();
 }
 

@@ -10,11 +10,11 @@
 #------------------------------------------------------------------------------
 # Paths and tools
 #------------------------------------------------------------------------------
-
-PATH_MAKE       = $(CURDIR)/../Make
 PATH_SRC        = $(CURDIR)/../../Src
-PATH_TMP        = $(CURDIR)/../Tmp/STM32F446RE_x64
-PATH_BIN        = $(CURDIR)/../Bin/STM32F446RE_x64
+PATH_TGT        = $(PATH_SRC)/Target/STM32F446re
+PATH_MAKE       = $(PATH_TGT)/Make
+PATH_TMP        = $(CURDIR)/../Tmp/CM4_LiteRTOS_x64
+PATH_BIN        = $(CURDIR)/../Bin/CM4_LiteRTOS_x64
 PATH_OBJ        = $(PATH_TMP)/Obj
 
 ifeq ($(TYP_OS),win)
@@ -98,7 +98,8 @@ CFLAGS         = -O0                                                       \
                  -ffunction-sections                                       \
                  -fdata-sections                                           \
                  -MMD -MF $(PATH_OBJ)/$(basename $(@F)).d                  \
-                 -I$(PATH_SRC)
+                 -I$(PATH_SRC)                                             \
+                 -I$(PATH_SRC)/Target/STM32F446re
 
 CPPFLAGS       = $(CFLAGS)                                                 \
                  -fno-rtti                                                 \
@@ -117,7 +118,7 @@ LDFLAGS        = $(CPPFLAGS)                                               \
                  -specs=nosys.specs                                        \
                  -T $(PATH_MAKE)/stm32f446re.ld                            \
                  -Wl,--print-memory-usage                                  \
-                 -Wl,-Map,$(PATH_BIN)/stm32f446re.map
+                 -Wl,-Map,$(PATH_BIN)/cm4_litertos.map
 
 
 #------------------------------------------------------------------------------
@@ -127,9 +128,9 @@ LDFLAGS        = $(CPPFLAGS)                                               \
 SRC_FILES      = $(PATH_SRC)/App/App                                            \
                  $(PATH_SRC)/App/IntVect                                        \
                  $(PATH_SRC)/App/SysStartup                                     \
-                 $(PATH_SRC)/Mcal/Gpio                                          \
-                 $(PATH_SRC)/Mcal/Gpt                                           \
-                 $(PATH_SRC)/Mcal/Mcu                                           \
+                 $(PATH_SRC)/Target/STM32F446re/Mcal/Gpio                       \
+                 $(PATH_SRC)/Target/STM32F446re/Mcal/Gpt                        \
+                 $(PATH_SRC)/Target/STM32F446re/Mcal/Mcu                        \
                  $(PATH_SRC)/OS/Os
 
 
@@ -145,7 +146,7 @@ FILES_O := $(addprefix $(PATH_OBJ)/, $(notdir $(addsuffix .o, $(SRC_FILES))))
 # Build targets
 #------------------------------------------------------------------------------
 
-all : clean_all print_version $(PATH_BIN)/Stm32f446re.elf
+all : clean_all print_version $(PATH_BIN)/cm4_litertos.elf
 
 .PHONY : clean_all
 clean_all :
@@ -167,17 +168,17 @@ print_version :
 	@$(CC) -v
 	@$(ECHO)
 
-$(PATH_BIN)/Stm32f446re.elf : $(FILES_O)
+$(PATH_BIN)/cm4_litertos.elf : $(FILES_O)
 	@-$(ECHO)
-	@-$(ECHO) +++ linking application to absolute object file $(PATH_BIN)/stm32f446re.elf
-	@-$(CC) -x none $(LDFLAGS) $(FILES_O) -o $(PATH_BIN)/stm32f446re.elf
+	@-$(ECHO) +++ linking application to absolute object file $(PATH_BIN)/cm4_litertos.elf
+	@-$(CC) -x none $(LDFLAGS) $(FILES_O) -o $(PATH_BIN)/cm4_litertos.elf
 	@-$(ECHO)
-	@-$(ECHO) +++ create HEX-file $(PATH_BIN)/stm32f446re.hex
-	@-$(OBJCOPY) $(PATH_BIN)/stm32f446re.elf -O ihex $(PATH_BIN)/stm32f446re.hex
-	@-$(ECHO) +++ create list file $(PATH_BIN)/stm32f446re.list
-	@-$(OBJDUMP) $(PATH_BIN)/stm32f446re.elf -d > $(PATH_BIN)/stm32f446re.list
-	@-$(ECHO) +++ create symbols with readelf in $(PATH_BIN)/stm32f446re.readelf
-	@-$(READELF) $(PATH_BIN)/stm32f446re.elf -a > $(PATH_BIN)/stm32f446re.readelf
+	@-$(ECHO) +++ create HEX-file $(PATH_BIN)/cm4_litertos.hex
+	@-$(OBJCOPY) $(PATH_BIN)/cm4_litertos.elf -O ihex $(PATH_BIN)/cm4_litertos.hex
+	@-$(ECHO) +++ create list file $(PATH_BIN)/cm4_litertos.list
+	@-$(OBJDUMP) $(PATH_BIN)/cm4_litertos.elf -d > $(PATH_BIN)/cm4_litertos.list
+	@-$(ECHO) +++ create symbols with readelf in $(PATH_BIN)/cm4_litertos.readelf
+	@-$(READELF) $(PATH_BIN)/cm4_litertos.elf -a > $(PATH_BIN)/cm4_litertos.readelf
 
 #------------------------------------------------------------------------------
 # Pattern rules

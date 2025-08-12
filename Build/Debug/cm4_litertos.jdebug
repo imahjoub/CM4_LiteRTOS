@@ -4,7 +4,7 @@
 *                         www.segger.com                             *
 **********************************************************************
 
-File          : STM32F446_FlashCraft/Build/Debug/stm32f446re.jdebug
+File          : CM4_LiteRTOS/Build/Debug/cm4_litertos.jdebug
 Created       : 1 Jan 2021 14:28
 Ozone Version : V3.20f
 */
@@ -32,7 +32,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  File.Open ("$(ProjectDir)/../Bin/STM32F446RE_x64/stm32f446re.elf");
+  File.Open ("$(ProjectDir)/../Bin/CM4_LiteRTOS_x64/cm4_litertos.elf");
 }
 
 /*********************************************************************
