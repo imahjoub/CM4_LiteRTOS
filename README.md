@@ -3,9 +3,7 @@
 <p align="center">
     <a href="https://github.com/imahjoub/CM4_LiteRTOS/actions">
         <img src="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS.yml/badge.svg" alt="Build Status"></a>
-    <a href="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS_CodeQl.yml">
-        <img src="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS_CodeQl.yml/badge.svg" alt="CodeQL"></a>
-    <a href="https://github.com/imahjoub/CM4_LiteRTOS/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc">
+    <a href="https://github.com/imahjoub/CM4_LiteRTOS/issues">
         <img src="https://custom-icon-badges.herokuapp.com/github/issues-raw/imahjoub/CM4_LiteRTOS?logo=github" alt="Issues" /></a>
     <a href="https://github.com/imahjoub/CM4_LiteRTOS/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
@@ -17,7 +15,7 @@
 
 
 CM4_LiteRTOS is a minimal, high-performance real-time operating system designed for ARM Cortex-M4 microcontrollers.  
-It provides essential multitasking features like thread scheduling, time delays, and context switching — implemented in clean, bare-metal C with a small footprint.
+It provides essential multitasking features like thread scheduling, time delays, and context switching â€” implemented in clean, bare-metal C with a small footprint.
 
 Although the current example targets the STM32F446RE, the core OS is hardware-agnostic and can be adapted to any Cortex-M4 MCU with minimal changes.
 
@@ -27,7 +25,7 @@ Although the current example targets the STM32F446RE, the core OS is hardware-ag
 - **Configurable thread priorities**
 - **Blocking delays with millisecond granularity**
 - **Idle task with low-power hooks**
-- **Compact footprint** — minimal RAM/flash usage
+- **Compact footprint** â€” minimal RAM/flash usage
 - **Easily portable** to other Cortex-M4 MCUs
 
 ## Example
