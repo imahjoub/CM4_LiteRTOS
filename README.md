@@ -3,8 +3,6 @@
 <p align="center">
     <a href="https://github.com/imahjoub/CM4_LiteRTOS/actions">
         <img src="https://github.com/imahjoub/CM4_LiteRTOS/actions/workflows/CM4_LiteRTOS.yml/badge.svg" alt="Build Status"></a>
-    <a href="https://github.com/imahjoub/CM4_LiteRTOS/issues">
-        <img src="https://custom-icon-badges.herokuapp.com/github/issues-raw/imahjoub/CM4_LiteRTOS?logo=github" alt="Issues" /></a>
     <a href="https://github.com/imahjoub/CM4_LiteRTOS/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License"></a>
     <a href="https://github.com/imahjoub/CM4_LiteRTOS" alt="GitHub code size in bytes">
