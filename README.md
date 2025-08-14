@@ -37,3 +37,7 @@ The provided `App.c` demonstrates running two concurrent tasks:
 - Tested on STM32F446RE
 - Portable to any ARM Cortex-M4 with minimal adaptation
 
+## Licensing
+This project is dual-licensed under the MIT License and GPLv3. While most of the code is MIT-licensed,
+the inclusion of `stdatomic` requires adherence to GPLv3 terms as well.
+For details, see `LICENSE-MIT` and `LICENSE-GPLv3`.
