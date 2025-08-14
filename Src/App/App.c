@@ -74,15 +74,14 @@ int main(void)
   /* Os Initialization */
   OS_Init(IdleThread_Stack, sizeof(IdleThread_Stack));
 
-  /* Fabricate Cortex-M ISR stack frame for blinky1 */
+  /* Initialize Cortex-M ISR stack frame for the Blinky1 thread */
   OSThread_Start(&Blinky_Thread,
                  3U,
                  &Blinky_Main,
                  Blinky_Stack,
                  sizeof(Blinky_Stack));
 
-
-  /* Fabricate Cortex-M ISR stack frame for Toggle-PC3 */
+  /* Initialize Cortex-M ISR stack frame for the PC3 Toggle thread */
   OSThread_Start(&TogglePC3_Thread,
                  2U,
                  &TogglePC3_Main,

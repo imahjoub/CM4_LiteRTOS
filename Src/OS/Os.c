@@ -19,6 +19,14 @@ uint32_t  OS_DelayedSet;        /* bitmask of threads that are delayed */
 #define LOG2(x) (32U - (uint32_t)__builtin_clz(x))
 
 
+/* Optimized version for Cortex-M using GCC __builtin_clz */
+static inline uint32_t HighestSetBitIndex(uint32_t value)
+{
+  /* 32 - number of leading zeros gives zero-based index of highest set bit */
+  return 32U - (uint32_t)__builtin_clz(value);
+}
+
+
 static void IdleThread_Main(void)
 {
   while(1U)
@@ -33,33 +41,31 @@ void OS_Init(void *StackStorage, uint32_t SatckSize)
   /* set the PendSV interrupt priority to the lowest level 0xFF */
   NVIC_SYS_PRI3_R |= (0xFFUL << 16U);
 
-  /* start IdleThread thread */
+  /* Start IdleThread thread */
   OSThread_Start(&IdleThread, 0U, &IdleThread_Main, StackStorage, SatckSize);
 }
 
 void OS_Sched(void)
 {
-  /* choose the next thread to execute... */
+  /* Select the next thread to execute */
   OSThread* NextThread;
 
-  /* idle condition? */
+  /* Check for idle condition */
   if (OS_ReadySet == 0U)
   {
     NextThread = OS_Thread[0U]; /* the idle thread */
   }
   else
   {
+    /* Pick the highest-priority ready thread */
     NextThread = OS_Thread[LOG2(OS_ReadySet)];
   }
-
-  /* temporarty for the next thread */
-  //OSThread * const next = OS_Thread[OS_CurrIdx];
 
   /* trigger PendSV, if needed */
   if(NextThread != OS_Curr)
   {
     OS_Next  = NextThread;
-    ICSR    |= (1UL << 28U);
+    ICSR    |= (1UL << 28U); /* set PendSV pending bit */
   }
 }
 
@@ -68,17 +74,14 @@ void OS_OnIdle(void)
   PC10_On();
   PC10_Off();
 
-  /* stop the CPU and Wait for Interrupt */
-  //Wait_For_Interrupt();
+  /* Stop the CPU and Wait for Interrupt */
+  Wait_For_Interrupt();
 }
 
 
 void OS_msDelay(uint32_t Ticks)
 {
   Disable_Irq();
-
-  /* TBD never call OS_delay from the idleThread */
-  //Q_REQUIRE(OS_curr != OS_thread[0]);
 
   OS_Curr->TimeOut = Ticks;
 
@@ -92,26 +95,28 @@ void OS_msDelay(uint32_t Ticks)
 
 void OS_Tick(void)
 {
-  uint32_t workingSet = OS_DelayedSet;
+  uint32_t pendingDelayedThreads = OS_DelayedSet;
 
-  while (workingSet != 0U)
+  while (pendingDelayedThreads != 0U)
   {
-    OSThread* LocalThread = OS_Thread[LOG2(workingSet)];
-    uint32_t bit;
+    /* Find the highest-priority delayed thread */
+    uint32_t Index      = LOG2(pendingDelayedThreads);
+    OSThread *Thread    = OS_Thread[Index];
+    uint32_t ThreadBit  = (1U << (Thread->Prio - 1U));
 
-    bit = (1U << (LocalThread->Prio - 1U));
-
-    --LocalThread->TimeOut;
-
-    if (LocalThread->TimeOut == 0U)
+    /* Decrement timeout counter */
+    if (--Thread->TimeOut == 0U)
     {
-      OS_ReadySet   |=  bit;  /* insert to set */
-      OS_DelayedSet &= ~bit;  /* remove from set */
+      /* Timeout expired: move thread to ready set */
+      OS_ReadySet   |= ThreadBit;
+      OS_DelayedSet &= ~ThreadBit;
     }
 
-    workingSet &= ~bit;      /* remove from working set */
+    /* Remove this thread from local working set */
+    pendingDelayedThreads &= ~ThreadBit;
   }
 }
+
 
 
 void OS_Run(void)
@@ -133,6 +138,7 @@ void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, 
 
   uint32_t *StckLimit;
 
+  /* Initialize Cortex-M exception stack frame (automatically saved on exception entry) */
   *(--StckPointer) = (1U << 24);              /* xPSR */
   *(--StckPointer) = (uint32_t)ThreadHandler; /* PC   */
   *(--StckPointer) = 0x0000000EU;             /* LR   */
@@ -151,23 +157,23 @@ void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, 
   *(--StckPointer) = 0x00000005U;             /* R5   */
   *(--StckPointer) = 0x00000004U;             /* R4   */
 
-  /* save the top of the stack in the thread's attibute */
+  /* Save top of stack pointer in TCB */
   TCB->MyStckPointer = StckPointer;
 
-  /* round up the bottom of the stack to the 8-byte boundary */
+  /* Round bottom of stack up to 8-byte boundary for pre-fill */
   StckLimit = (uint32_t *)(((((uint32_t)StkStorage - 1U) / 8U) + 1U) * 8U);
 
-  /* pre-fill the unused part of the stack with 0xDEADBEEF */
+  /* Pre-fill unused stack space with a known pattern for debugging */
   for (StckPointer = StckPointer - 1U; StckPointer >= StckLimit; --StckPointer)
   {
-    *StckPointer = 0xDEADBEEFU;
+    *StckPointer = 0xFACEB00CUL;
   }
 
-  /* register the thread with the OS */
+  /* Register thread with the OS */
   OS_Thread[Prio] = TCB;
   TCB->Prio       = Prio;
 
-  /* make the thread ready to run */
+  /* Make thread ready to run (except priority 0, reserved for idle) */
   if(Prio > 0U)
   {
     OS_ReadySet |= (1U << (Prio - 1U));
