@@ -1,8 +1,7 @@
 ﻿# -----------------------------------------------------
 #  Copyright Iliass Mahjoub 2023.
 #  Distributed under MIT License
-#  (See accompanying file LICENSE
-#  or copy at http://www.boost.org/LICENSE_1_0.txt)
+#  (See accompanying file LICENSE)
 # -----------------------------------------------------
 
 name: CM4_LiteRTOS
