@@ -3,11 +3,32 @@
 
 #include "stdatomic.h"
 
+
+/*----------------------------------------------------------------------------
+ - Atomic flag used to ensure exclusive access to GPIOC pins
+  during read-modify-write operations.
+-----------------------------------------------------------------------------*/
 atomic_flag port_c_lock = ATOMIC_FLAG_INIT;
 
+/*----------------------------------------------------------------------------
+- @brief Port C Resource Management
+-
+- @desc Provides atomic functions to acquire and release exclusive access
+        to GPIO port C using a spinlock mechanism.
+-----------------------------------------------------------------------------*/
+static inline void ReleasePortResource(void) { atomic_flag_clear       (&port_c_lock); }
 static inline void AcquirePortResource(void) { atomic_flag_test_and_set(&port_c_lock); }
-static inline void ReleasePortResource(void) { atomic_flag_clear(&port_c_lock);        }
 
+
+/*----------------------------------------------------------------------------
+- @brief GPIO_Init
+-
+- @desc Initializes GPIO ports A and C: enables clocks and configures
+        selected pins (USER_LED, PC2, PC3, PC10) as outputs.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void GPIO_Init(void)
 {
   /* Enable GPIOA and GPIOC clocks */
@@ -31,6 +52,14 @@ void GPIO_Init(void)
 }
 
 
+/*----------------------------------------------------------------------------
+- @brief Led_Blinky
+-
+- @desc Toggles the USER LED on GPIOA with a 20 ms delay for blinking.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void Led_Blinky(void)
 {
   /* Toggle the LED pin */
@@ -38,18 +67,46 @@ void Led_Blinky(void)
   OS_msDelay(20U);
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief Led_On
+-
+- @desc Sets the USER LED pin on GPIOA to turn the LED on.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void Led_On(void)
 {
   /* Turn on the LED */
   GPIOA_ODR |= (uint32_t)(1UL << 5U);
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief Led_Off
+-
+- @desc Clears the USER LED pin on GPIOA to turn the LED off.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void Led_Off(void)
 {
   /* Turn off the LED */
   GPIOA_ODR &= (uint32_t)(~(1UL << 5U));
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC3_On
+-
+- @desc Sets GPIOC pin 3 high with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC3_On(void)
 {
   AcquirePortResource();
@@ -57,6 +114,16 @@ void PC3_On(void)
   ReleasePortResource();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC3_Off
+-
+- @desc Clears GPIOC pin 3 with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC3_Off(void)
 {
   AcquirePortResource();
@@ -64,6 +131,16 @@ void PC3_Off(void)
   ReleasePortResource();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC2_Off
+-
+- @desc Clears GPIOC pin 2 with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC2_Off(void)
 {
   AcquirePortResource();
@@ -71,6 +148,16 @@ void PC2_Off(void)
   ReleasePortResource();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC2_On
+-
+- @desc Sets GPIOC pin 2 high with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC2_On(void)
 {
   AcquirePortResource();
@@ -78,6 +165,16 @@ void PC2_On(void)
   ReleasePortResource();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC10_On
+-
+- @desc Sets GPIOC pin 10 high with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC10_On(void)
 {
   AcquirePortResource();
@@ -85,6 +182,16 @@ void PC10_On(void)
   ReleasePortResource();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PC10_Off
+-
+- @desc Clears GPIOC pin 10 with atomic access to ensure exclusive
+        port access.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void PC10_Off(void)
 {
   AcquirePortResource();

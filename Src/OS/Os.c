@@ -3,9 +3,13 @@
 #include "Mcal/Mcu.h"
 #include "Os.h"
 
-__attribute__ ((naked)) void PendSV_Handler(void);
-static void IdleThread_Main(void);
 
+/*----------------------------------------------------------------------------
+- OS Global Variables
+-
+- @desc Variables used by the OS kernel to track threads, scheduling,
+  and thread states.
+-----------------------------------------------------------------------------*/
 OSThread * volatile OS_Curr;    /* pointer to the current thread */
 OSThread * volatile OS_Next;    /* pointer to the next thread to run */
 
@@ -16,17 +20,34 @@ uint8_t   OS_CurrIdx;           /* current thread index for round robin scheduli
 uint32_t  OS_ReadySet;          /* bitmask of threads that are ready to run */
 uint32_t  OS_DelayedSet;        /* bitmask of threads that are delayed */
 
+/*----------------------------------------------------------------------------
+- OS Function Declarations
+-----------------------------------------------------------------------------*/
+__attribute__ ((naked)) void PendSV_Handler(void);
+static void IdleThread_Main(void);
+
+
+/*----------------------------------------------------------------------------
+- @brief LOG2
+-
+- @desc Returns the position of the highest set bit (1-based) in a 32-bit
+  integer, used for priority selection in the OS.
+-
+- @param x   32-bit input value
+- @return uint32_t  Highest set bit position
+-----------------------------------------------------------------------------*/
 #define LOG2(x) (32U - (uint32_t)__builtin_clz(x))
 
 
-/* Optimized version for Cortex-M using GCC __builtin_clz */
-static inline uint32_t HighestSetBitIndex(uint32_t value)
-{
-  /* 32 - number of leading zeros gives zero-based index of highest set bit */
-  return 32U - (uint32_t)__builtin_clz(value);
-}
+/*----------------------------------------------------------------------------
+- @brief IdleThread_Main
 
+- @desc Idle thread loop that repeatedly calls OS_OnIdle.
 
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 static void IdleThread_Main(void)
 {
   while(1U)
@@ -36,6 +57,17 @@ static void IdleThread_Main(void)
 }
 
 
+/*----------------------------------------------------------------------------
+- @brief OS_Init
+
+- @desc Initializes the OS by setting PendSV to lowest priority and
+        starting the idle thread.
+
+- @param StackStorage   Idle thread stack base address
+         SatckSize      Idle thread stack size
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_Init(void *StackStorage, uint32_t SatckSize)
 {
   /* set the PendSV interrupt priority to the lowest level 0xFF */
@@ -45,6 +77,16 @@ void OS_Init(void *StackStorage, uint32_t SatckSize)
   OSThread_Start(&IdleThread, 0U, &IdleThread_Main, StackStorage, SatckSize);
 }
 
+/*----------------------------------------------------------------------------
+- @brief OS_Sched
+
+- @desc Selects the highest-priority ready thread and triggers PendSV
+        if a context switch is required.
+
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_Sched(void)
 {
   /* Select the next thread to execute */
@@ -69,6 +111,17 @@ void OS_Sched(void)
   }
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief OS_OnIdle
+
+- @desc  Executes idle-time actions and places CPU in low-power
+         wait-for-interrupt state.
+
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_OnIdle(void)
 {
   PC10_On();
@@ -79,6 +132,16 @@ void OS_OnIdle(void)
 }
 
 
+/*----------------------------------------------------------------------------
+- @brief OS_msDelay
+
+- @desc Puts the current thread into the delayed set for a given number
+        of ticks and triggers rescheduling
+
+- @param Ticks   Delay duration in system ticks
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_msDelay(uint32_t Ticks)
 {
   Disable_Irq();
@@ -93,6 +156,16 @@ void OS_msDelay(uint32_t Ticks)
   Enable_Irq();
 }
 
+/*----------------------------------------------------------------------------
+- @brief OS_Tick
+
+- @desc Updates delayed threads each system tick, moves threads whose
+        timeouts expire into the ready set.
+
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_Tick(void)
 {
   uint32_t pendingDelayedThreads = OS_DelayedSet;
@@ -118,7 +191,15 @@ void OS_Tick(void)
 }
 
 
+/*----------------------------------------------------------------------------
+- @brief OS_Run
 
+- @desc
+
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OS_Run(void)
 {
   /* callback to configure and start interrupts */
@@ -129,6 +210,21 @@ void OS_Run(void)
   Enable_Irq();
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief OSThread_Start
+
+- @desc  Initializes a thread’s stack and TCB, pre-fills stack for debugging,
+         and marks the thread as ready to run in the OS.
+
+- @param TCB  Thread   : Control block pointer
+         Prio Thread   : Priority
+         ThreadHandler : Entry function for the thread
+         StkStorage    : Stack memory base address
+         StkSize       : Stack size
+
+- @return void
+-----------------------------------------------------------------------------*/
 void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, void *StkStorage, uint32_t StkSize)
 {
   /* round down the stack top to the 8-byte boundary
@@ -181,6 +277,17 @@ void OSThread_Start(OSThread *TCB, uint8_t Prio, OSThreadHandler ThreadHandler, 
 
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief PendSV_Handler
+
+- @desc Performs RTOS context switching: saves current thread state,
+        restores next thread state, and updates OS_Curr pointer.
+
+- @param void
+
+- @return void
+-----------------------------------------------------------------------------*/
 __attribute__ ((naked)) void PendSV_Handler(void)
 {
   __asm volatile

@@ -25,7 +25,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{680BD1D8-62A8-4168-8509-9BFBF9D84D7F}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\.github\workflows\CM4_LiteRTOS.yml = ..\..\.github\workflows\CM4_LiteRTOS.yml
-		..\..\.github\workflows\CM4_LiteRTOS_CodeQl.yml = ..\..\.github\workflows\CM4_LiteRTOS_CodeQl.yml
 	EndProjectSection
 EndProject
 Global
