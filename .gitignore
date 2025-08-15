@@ -5,3 +5,4 @@ Build/VS/.vs/
 Build/VS/STM32F446RE_RTOS.vcxproj.user
 Build/Bin/
 Build/Tmp/
+Build/Debug/cm4_litertos.jdebug.user
