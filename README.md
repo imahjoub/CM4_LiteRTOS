@@ -31,7 +31,7 @@ Although the current example targets the STM32F446RE, the core OS is hardware-ag
 ## Example
 The provided `App.c` demonstrates running two concurrent tasks:
 - A blinking LED task
-- A GPIO toggle task
+- A GPIO-PIN toggle task
 
 ## Supported MCUs
 - Tested on STM32F446RE

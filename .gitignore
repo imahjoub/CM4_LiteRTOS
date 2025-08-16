@@ -1,6 +1,6 @@
 Build/Debug/stm32f446re.jdebug.user
-Build/tools/gcc/
-Build/tools/
+Build/tools/gcc/gcc-13.2.1-arm-none-eabi
+Build/tools/util/bin
 Build/VS/.vs/
 Build/VS/STM32F446RE_RTOS.vcxproj.user
 Build/Bin/
