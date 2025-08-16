@@ -6,9 +6,6 @@
 
 /*----------------------------------------------------------------------------
 - OS Global Variables
--
-- @desc Variables used by the OS kernel to track threads, scheduling,
-  and thread states.
 -----------------------------------------------------------------------------*/
 OSThread * volatile OS_Curr;    /* pointer to the current thread */
 OSThread * volatile OS_Next;    /* pointer to the next thread to run */
@@ -208,6 +205,21 @@ void OS_Run(void)
   Disable_Irq();
   OS_Sched();
   Enable_Irq();
+}
+
+
+/*----------------------------------------------------------------------------
+- @brief OS_OnStartup
+-
+- @desc Sets the SysTick interrupt priority to the highest level.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
+void OS_OnStartup(void)
+{
+  /* Set the SysTick interrupt priority (highest) */
+  NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 

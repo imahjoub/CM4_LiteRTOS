@@ -4,8 +4,16 @@
 #include <Mcal/Mcu.h>
 #include <Mcal/Gpio.h>
 
-/* Defines */
-
+/*----------------------------------------------------------------------------
+- @brief SystemInit
+-
+- @desc Initializes system settings: enables FPU, configures
+        internal clock, resets RCC registers, disables interrupts, and sets
+        Flash latency and caches.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void SystemInit(void)
 {
   /* set coprocessor access control register CP10 and CP11 Full Access */
@@ -30,6 +38,14 @@ void SystemInit(void)
   FLASH_ACR = (uint32_t)((1UL << 9U) | (1UL << 10U) | (5UL << 0U));
 }
 
+/*----------------------------------------------------------------------------
+- @brief SetSysClock
+-
+- @desc Configures and enables the system clock using HSE and PLL.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void SetSysClock(void)
 {
   /* Enable HSE */
@@ -76,16 +92,24 @@ void SetSysClock(void)
   }
 }
 
-
+/*----------------------------------------------------------------------------
+- @brief SysTick_Init
+-
+- @desc Initializes the SysTick timer to generate interrupts every 1 ms
+-       using the main processor clock.
+-
+- @param void
+- @return void
+-----------------------------------------------------------------------------*/
 void SysTick_Init(void)
 {
   /* Reset the SysTick control register. */
   STK_CTRL = (uint32_t)0x00000000UL;
 
   /* Set the SysTick reload register to be equivalent to 1ms. */
-  STK_LOAD = (uint32_t)(180000UL);  /* 1000us(ms) */
-  //STK_LOAD = (uint32_t)(180UL);       /*   1us      here I saw a strange behvior, sytick interrupt too fast it does not let osthread start to happen*/
-  //STK_LOAD = (uint32_t)(18000UL);       /*   100us      */
+  STK_LOAD = (uint32_t)(180000UL);   /* 1000us(ms) */
+  //STK_LOAD = (uint32_t)(180UL);    /*   1us      here I saw a strange behvior, sytick interrupt too fast it does not let osthread start to happen*/
+  //STK_LOAD = (uint32_t)(18000UL);  /*   100us      */
 
   /* Initialize the SysTick counter value (clear it to zero). */
   STK_VAL = (uint32_t)0x00000000UL;
@@ -101,6 +125,16 @@ void SysTick_Init(void)
 }
 
 
+/*----------------------------------------------------------------------------
+- @brief NVIC_SetPriority
+-
+- @desc Sets the priority of a given IRQ or system exception.
+-       Supports both system exceptions (negative IRQn) and peripheral IRQs.
+-
+- @param IRQn     : IRQ number (negative for system exceptions)
+- @param Priority : Priority value (0..15, lower = higher priority)
+- @return void
+-----------------------------------------------------------------------------*/
 void NVIC_SetPriority(int32_t IRQn, uint32_t Priority)
 {
   /* Shift for top 4 bits */
@@ -121,21 +155,37 @@ void NVIC_SetPriority(int32_t IRQn, uint32_t Priority)
   }
 }
 
+/*----------------------------------------------------------------------------
+- @brief Wait_For_Interrupt
+-
+- @desc Executes the WFI (Wait For Interrupt) instruction to put the CPU
+-       into low-power sleep mode until an interrupt occurs.
+-----------------------------------------------------------------------------*/
 inline void Wait_For_Interrupt(void)
 {
   __asm volatile ("wfi":::"memory");
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief Enable_Irq
+-
+- @desc Enables all maskable interrupts by setting the I-bit in the CPSR.
+-----------------------------------------------------------------------------*/
 inline void Enable_Irq(void)
 {
   __asm volatile ("cpsie i" ::: "memory");
 }
 
+
+/*----------------------------------------------------------------------------
+- @brief Disable_Irq
+-
+- @desc Disables all maskable interrupts by clearing the I-bit in the CPSR.
+-----------------------------------------------------------------------------*/
 inline void Disable_Irq(void)
 {
   __asm volatile ("cpsid i" ::: "memory");
 }
-
-
 
 
