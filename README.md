@@ -14,8 +14,11 @@
 </p>
 
 
-CM4_LiteRTOS is a minimal, high-performance real-time operating system designed for ARM Cortex-M4 microcontrollers.  
+CM4_LiteRTOS is a minimal, high-performance real-time operating system designed for ARM Cortex-M4 microcontrollers.
+
 It provides essential multitasking features like thread scheduling, time delays, and context switching — implemented in clean, bare-metal C with a small footprint.
+
+This project is entirely self-sufficient, utilizing only the files included in the repository, with no external dependencies needed.
 
 Although the current example targets the STM32F446RE, the core OS is hardware-agnostic and can be adapted to any Cortex-M4 MCU with minimal changes.
 
